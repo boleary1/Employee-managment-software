@@ -1,5 +1,6 @@
 var mysql = require("mysql2");
 var inquirer = require("inquirer");
+const { lastIndexOf } = require("mysql2/lib/constants/charset_encodings");
 
 var connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -30,39 +31,39 @@ function init() {
                 "Update an employee's role?",
             ]
         })
-    .then(function (answer) {
-        console.log(answer)
-        switch (answer.action) {
-            case "View all departments?":
-                
-                viewDepartments();
-                break;
+        .then(function (answer) {
+            console.log(answer)
+            switch (answer.action) {
+                case "View all departments?":
 
-            case "Add a department?":
-                addDepartments();
-                break;
+                    viewDepartments();
+                    break;
 
-            case "View all roles?":
-                viewRoles();
-                break;
+                case "Add a department?":
+                    addDepartments();
+                    break;
 
-            case "Add a role?":
-                addRole();
-                break;
+                case "View all roles?":
+                    viewRoles();
+                    break;
 
-            case "View employee list?":
-                viewEmployees();
-                break;
+                case "Add a role?":
+                    addRole();
+                    break;
 
-            case "Add an employee?":
-                addEmployee();
-                break;
+                case "View employee list?":
+                    viewEmployees();
+                    break;
 
-            case "Update an employee's role?":
-                updateRole();
-                break;
-        }
-    });
+                case "Add an employee?":
+                    addEmployee();
+                    break;
+
+                case "Update an employee's role?":
+                    updateRole();
+                    break;
+            }
+        });
 }
 
 connection.connect(function (err) {
@@ -72,5 +73,41 @@ connection.connect(function (err) {
 
 
 function viewDepartments() {
-    console.log()
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err;
+        // Log all results of the SELECT statement
+        console.table(res);
+        connection.end();
+      });
+    console.log("view Departments function")
+};
+function addDepartments() {
+    let current_id = 0
+    connection.query("SELECT * FROM department", function(err, res) {
+        if (err) throw err;
+        current_id = (res.slice(-1).pop()).id;
+      });
+
+    inquirer
+    .prompt({
+        name: "addDepartment",
+        type: "input",
+        message: "What Depatment would you like to add?",
+
+    })
+    .then(function (answer) {
+        connection.query(
+            "INSERT INTO department SET ?",
+            {
+                id: (current_id + 1),
+                department_name: answer.addDepartment
+            },
+            function(err) {
+                if (err) console.log(err);
+                console.log("Your department was created successfully!");
+            })
+        console.log(answer)
+                connection.end();
+
+    });
 };
