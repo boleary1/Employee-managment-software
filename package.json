@@ -1,0 +1,27 @@
+{
+  "name": "employee-managment-software",
+  "version": "1.0.0",
+  "description": "Employee managment software",
+  "main": "script.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^7.3.3",
+    "mysql": "^2.18.1",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node script.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boleary1/Employee-managment-software.git"
+  },
+  "author": "Brian O'Leary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/boleary1/Employee-managment-software/issues"
+  },
+  "homepage": "https://github.com/boleary1/Employee-managment-software#readme"
+}
