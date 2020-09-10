@@ -73,41 +73,98 @@ connection.connect(function (err) {
 
 
 function viewDepartments() {
-    connection.query("SELECT * FROM department", function(err, res) {
+    connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.table(res);
         connection.end();
-      });
-    console.log("view Departments function")
+    });
 };
 function addDepartments() {
     let current_id = 0
-    connection.query("SELECT * FROM department", function(err, res) {
+    connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
         current_id = (res.slice(-1).pop()).id;
-      });
+    });
 
     inquirer
-    .prompt({
-        name: "addDepartment",
-        type: "input",
-        message: "What Depatment would you like to add?",
+        .prompt({
+            name: "addDepartment",
+            type: "input",
+            message: "What Depatment would you like to add?",
 
-    })
-    .then(function (answer) {
-        connection.query(
-            "INSERT INTO department SET ?",
-            {
-                id: (current_id + 1),
-                department_name: answer.addDepartment
-            },
-            function(err) {
-                if (err) console.log(err);
-                console.log("Your department was created successfully!");
-            })
-        console.log(answer)
-                connection.end();
+        })
+        .then(function (answer) {
+            connection.query(
+                "INSERT INTO department SET ?",
+                {
+                    id: (current_id + 1),
+                    department_name: answer.addDepartment
+                },
+                function (err) {
+                    if (err) console.log(err);
+                    console.log("Your department was created successfully!");
+                })
+            console.log(answer)
+            connection.end();
 
+        });
+};
+
+function viewRoles() {
+    connection.query("SELECT * FROM employee_role", function (err, res) {
+        if (err) console.log(err);
+        // Log all results of the SELECT statement
+        console.table(res);
+        connection.end();
     });
+};
+
+function addRole() {
+    let current_id = 0
+    let department_list = []
+    connection.query("SELECT * FROM employee_role", function (err, res) {
+        if (err) console.log(err);
+        current_id = (res.slice(-1).pop()).id;
+    });
+    connection.query("SELECT * FROM department", function (err, res) {
+        if (err) console.log(err);
+        res.forEach(department => {
+            department_list.push(department.department_name);
+        });
+    });
+
+    inquirer
+        .prompt({
+            name: "addRole",
+            type: "input",
+            message: "What is the job title that you would you like to add?",
+        },
+            {
+                name: "addRole_salary",
+                type: "input",
+                message: "What is the salary for the job that you're adding?",
+            },
+            {
+                name: "addRole_department",
+                type: "list",
+                message: "What department is the job in?",
+                choices: department_list,
+            },
+        )
+        .then(function (answer) {
+            connection.query(
+                "INSERT INTO department SET ?",
+                {
+                    id: (current_id + 1),
+                    department_name: answer.addDepartment
+                },
+                function (err) {
+                    if (err) console.log(err);
+                    console.log("Your department was created successfully!");
+                })
+            console.log(answer)
+            connection.end();
+
+        });
 };
