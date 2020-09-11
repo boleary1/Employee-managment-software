@@ -5,10 +5,9 @@ USE employee_listDB;
 CREATE TABLE employee
 (
   id INT NOT NULL AUTO_INCREMENT,
-    position INT NULL,
     first_name VARCHAR(30) NULL,
     last_name VARCHAR(30) NULL,
-    role_id INT NULL,
+    role_title VARCHAR(30) NULL,
     manager_id INT NULL,
     PRIMARY KEY (id)
 );

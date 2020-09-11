@@ -12,10 +12,12 @@ var connection = mysql.createConnection({
     database: "employee_listDB"
 });
 
+function init(){
+    console.log("Welcome to the Employee managment software!");
+    homeScreen();
+};
 
-
-function init() {
-    console.log("Welcome to the Employee managment software!")
+function homeScreen() {
     inquirer
         .prompt({
             name: "action",
@@ -26,7 +28,7 @@ function init() {
                 "Add a department?",
                 "View all roles?",
                 "Add a role?",
-                "View an employee?",
+                "View employee list?",
                 "Add an employee?",
                 "Update an employee's role?",
             ]
@@ -77,7 +79,7 @@ function viewDepartments() {
         if (err) throw err;
         // Log all results of the SELECT statement
         console.table(res);
-        connection.end();
+        homeScreen();
     });
 };
 function addDepartments() {
@@ -106,7 +108,7 @@ function addDepartments() {
                     console.log("Your department was created successfully!");
                 })
             console.log(answer)
-            connection.end();
+            homeScreen();
 
         });
 };
@@ -116,7 +118,7 @@ function viewRoles() {
         if (err) console.log(err);
         // Log all results of the SELECT statement
         console.table(res);
-        connection.end();
+        homeScreen();
     });
 };
 
@@ -168,8 +170,76 @@ function addRole() {
                         if (err) console.log(err);
                         console.log("Your role was created successfully!");
                     })
-                connection.end();
+                    homeScreen();
+        });
+};
 
 
+
+function viewEmployees() {
+    connection.query("SELECT * FROM employee", function (err, res) {
+        if (err) console.log(err);
+        // Log all results of the SELECT statement
+        console.table(res);
+        homeScreen();
+    });
+};
+
+
+function addEmployee() {
+    let current_id = 1
+    let role_list = [];
+    connection.query("SELECT * FROM employee", function (err, res) {
+        if (err) console.log(err);
+        current_id = (res.slice(-1).pop()).id; //finds current id
+    });
+    connection.query("SELECT * FROM employee_role", function (err, res) {
+        if (err) console.log(err);
+        res.forEach(employee_role => {
+            role_list.push(employee_role.title);
+            console.log("role lise " + role_list)
+        });
+    });
+
+    inquirer
+        .prompt([
+            {
+                name: "firstName",
+                type: "input",
+                message: "What is new Employee's first name?",
+            },
+            {
+                name: "lastName",
+                type: "input",
+                message: "What is new Employee's last name?",
+            },
+            {
+                name: "select_role",
+                type: "list",
+                message: "What job are they hired for?",
+                choices: role_list
+            },
+            {
+                name: "employee_manager",
+                type: "input",
+                message: "What is the ID of this employee's manager?",
+            },
+        ])
+        .then(function (answer) {
+
+                connection.query(
+                    "INSERT INTO employee SET ?",
+                    {
+                        id: (current_id + 1),
+                        first_name: answer.firstName,
+                        last_name: answer.lastName,
+                        role_title: answer.select_role,
+                        manager_id: answer.employee_manager, //needs to be a variable
+                    },
+                    function (err) {
+                        if (err) console.log(err);
+                        console.log("Your role was created successfully!");
+                    })
+                    homeScreen();
         });
 };
