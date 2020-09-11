@@ -1,6 +1,6 @@
 var mysql = require("mysql2");
 var inquirer = require("inquirer");
-const { lastIndexOf } = require("mysql2/lib/constants/charset_encodings");
+const { lastIndexOf } = require("mysql2/lib/constants/charset_encodings"); //issues with mysql. my sql two works better on my machine.
 
 var connection = mysql.createConnection({
     host: "127.0.0.1",
@@ -12,12 +12,12 @@ var connection = mysql.createConnection({
     database: "employee_listDB"
 });
 
-function init() {
+function init() { //npm start opens this function
     console.log("Welcome to the Employee managment software!");
     homeScreen();
 };
 
-function homeScreen() {
+function homeScreen() { //chose what to do
     inquirer
         .prompt({
             name: "action",
@@ -34,7 +34,7 @@ function homeScreen() {
                 "Quit the program"
             ]
         })
-        .then(function (answer) {
+        .then(function (answer) { //what to do with a selected answer
             console.log(answer)
             switch (answer.action) {
                 case "View all departments?":
@@ -73,7 +73,7 @@ function homeScreen() {
         });
 }
 
-connection.connect(function (err) {
+connection.connect(function (err) { //fires the init function
     if (err) console.log(err);
     init();
 });
@@ -91,7 +91,7 @@ function addDepartments() {
     let current_id = 0
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        current_id = (res.slice(-1).pop()).id;
+        current_id = (res.slice(-1).pop()).id; //checks for most recent id
     });
 
     inquirer
