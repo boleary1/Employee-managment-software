@@ -122,16 +122,13 @@ function viewRoles() {
 
 function addRole() {
     let current_id = 1
-    let department_list = []
-    let department_array = []
+    let department_list = [];
     connection.query("SELECT * FROM employee_role", function (err, res) {
         if (err) console.log(err);
         current_id = (res.slice(-1).pop()).id; //finds current id
     });
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) console.log(err);
-        department_array = res //something might be wrong here
-        console.log("department array" + department_array[1]) //pushhing "object instead of correct value."
         res.forEach(department => {
             department_list.push(department.department_name);
         });
@@ -153,45 +150,26 @@ function addRole() {
                 name: "addRole_department",
                 type: "list",
                 message: "What department is the job in?",
-                // choices: department_list,
-                // choices: department_array.department_name,
-                choices: function () {
-                    var choiceArray = [];
-                    for (var i = 0; i < department_array.length; i++) {
-                        choiceArray.push(department_array[i].department_name);
-                    }
-                    return choiceArray;
-                },
+                choices: department_list,
 
             },
         ])
         .then(function (answer) {
 
-            function beginQuery() {
                 connection.query(
                     "INSERT INTO employee_role SET ?",
                     {
                         id: (current_id + 1),
                         title: answer.addRole,
-                        department_id: 6, //needs to be a variable
+                        department_name: answer.addRole_department, //needs to be a variable
                         salary: answer.addRole_salary,
                     },
                     function (err) {
                         if (err) console.log(err);
                         console.log("Your role was created successfully!");
                     })
-                console.log(answer)
                 connection.end();
-            }
 
-            var chosenItem;
-            for (var i = 0; i < department_array.length; i++) { //something is wrong with this for loop.
-                if (department_array[i].item_name === answer.addRole_department) {
-                    chosenItem = department_array[i];
-                    console.log("chosen item" + chosenItem) 
-                    beginQuery();
-                }
-            }
 
         });
 };
