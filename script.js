@@ -12,7 +12,7 @@ var connection = mysql.createConnection({
     database: "employee_listDB"
 });
 
-function init(){
+function init() {
     console.log("Welcome to the Employee managment software!");
     homeScreen();
 };
@@ -31,6 +31,7 @@ function homeScreen() {
                 "View employee list?",
                 "Add an employee?",
                 "Update an employee's role?",
+                "Quit the program"
             ]
         })
         .then(function (answer) {
@@ -63,6 +64,10 @@ function homeScreen() {
 
                 case "Update an employee's role?":
                     updateRole();
+                    break;
+
+                case "Quit the program":
+                    connection.end();
                     break;
             }
         });
@@ -158,19 +163,19 @@ function addRole() {
         ])
         .then(function (answer) {
 
-                connection.query(
-                    "INSERT INTO employee_role SET ?",
-                    {
-                        id: (current_id + 1),
-                        title: answer.addRole,
-                        department_name: answer.addRole_department, //needs to be a variable
-                        salary: answer.addRole_salary,
-                    },
-                    function (err) {
-                        if (err) console.log(err);
-                        console.log("Your role was created successfully!");
-                    })
-                    homeScreen();
+            connection.query(
+                "INSERT INTO employee_role SET ?",
+                {
+                    id: (current_id + 1),
+                    title: answer.addRole,
+                    department_name: answer.addRole_department, //needs to be a variable
+                    salary: answer.addRole_salary,
+                },
+                function (err) {
+                    if (err) console.log(err);
+                    console.log("Your role was created successfully!");
+                })
+            homeScreen();
         });
 };
 
@@ -197,7 +202,6 @@ function addEmployee() {
         if (err) console.log(err);
         res.forEach(employee_role => {
             role_list.push(employee_role.title);
-            console.log("role lise " + role_list)
         });
     });
 
@@ -227,19 +231,79 @@ function addEmployee() {
         ])
         .then(function (answer) {
 
-                connection.query(
-                    "INSERT INTO employee SET ?",
-                    {
-                        id: (current_id + 1),
-                        first_name: answer.firstName,
-                        last_name: answer.lastName,
-                        role_title: answer.select_role,
-                        manager_id: answer.employee_manager, //needs to be a variable
-                    },
-                    function (err) {
-                        if (err) console.log(err);
-                        console.log("Your role was created successfully!");
-                    })
-                    homeScreen();
+            connection.query(
+                "INSERT INTO employee SET ?",
+                {
+                    id: (current_id + 1),
+                    first_name: answer.firstName,
+                    last_name: answer.lastName,
+                    role_title: answer.select_role,
+                    manager_id: answer.employee_manager, //needs to be a variable
+                },
+                function (err) {
+                    if (err) console.log(err);
+                    console.log("Your role was created successfully!");
+                })
+            homeScreen();
         });
+};
+
+function updateRole() {
+    let role_list = [];
+    connection.query("SELECT * FROM employee_role", function (err, res) {
+        if (err) console.log(err);
+        res.forEach(employee_role => {
+            role_list.push(employee_role.title);
+        });
+    });
+    connection.query("SELECT * FROM employee", function (err, res) {
+        if (err) console.log(err);
+        // Log all results of the SELECT statement
+        inquirer
+            .prompt([
+                {
+                    name: "select_employee",
+                    type: "rawlist",
+                    choices: function () {
+                        var choiceArray = [];
+                        for (var i = 0; i < res.length; i++) {
+                            choiceArray.push(res[i].first_name);
+                        }
+                        console.log("res" + res)
+                        return choiceArray;
+                    },
+                    message: "What Employee would you like to change the job for?"
+                },
+                {
+                    name: "select_role",
+                    type: "list",
+                    message: "What is there new job?",
+                    choices: role_list
+                },
+            ])
+            .then(function (answer) {
+                // get the information of the chosen item
+                var chosenEmployee;
+  
+                for (var i = 0; i < res.length; i++) {
+                    if (res[i].first_name === answer.select_employee) {
+                        chosenEmployee = res[i];
+                        connection.query(
+                            "UPDATE employee SET ? WHERE ?",
+                            [
+                                { role_title : answer.select_role },
+                                { first_name: chosenEmployee.first_name }
+                            ],
+                            function (error) {
+                                if (error) throw err;
+                                console.log("Role updated!");
+                                homeScreen();
+                            }
+                        )
+                    }
+                }
+            });
+    });
+
+
 };
