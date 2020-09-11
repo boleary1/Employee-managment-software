@@ -130,8 +130,8 @@ function addRole() {
     });
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) console.log(err);
-        department_array = res
-        console.log("department array" + department_array)
+        department_array = res //something might be wrong here
+        console.log("department array" + department_array[1]) //pushhing "object instead of correct value."
         res.forEach(department => {
             department_list.push(department.department_name);
         });
