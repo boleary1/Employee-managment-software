@@ -221,12 +221,13 @@ function addEmployee() {
                 name: "select_role",
                 type: "list",
                 message: "What job are they hired for?",
-                choices: role_list
+                choices: role_list,
             },
             {
                 name: "employee_manager",
-                type: "input",
+                type: "number",
                 message: "What is the ID of this employee's manager?",
+                
             },
         ])
         .then(function (answer) {
